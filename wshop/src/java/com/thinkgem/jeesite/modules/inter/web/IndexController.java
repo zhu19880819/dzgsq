@@ -109,7 +109,11 @@ public class IndexController extends BaseController {
 			/**
 			 * 查询分类
 			 */
+			WsProdCategory parent = new WsProdCategory();
+			parent.setId("04d9d4e659754f6598e1bff48d128481");  //只查询积分商品的分类
 			WsProdCategory wsProdCategory=new WsProdCategory();
+			wsProdCategory.setParent(parent);
+			wsProdCategory.setId("04d9d4e659754f6598e1bff48d128481");
 			List<WsProdCategory> wsProdCategoryList=wsProdCategoryService.findList(wsProdCategory);
 			for (WsProdCategory prodCat:wsProdCategoryList) {
 				prodCat.setImageUrl(UrlUtils.getNetUrl(prodCat.getImageUrl()));
@@ -120,6 +124,7 @@ public class IndexController extends BaseController {
 			WsProduct wsProduct=new WsProduct();
 			wsProduct.setOnGoodState(WsConstant.YES);
 			wsProduct.setIsHomeRecommd(InterConstant.YES);
+			wsProduct.setIsGift("2");   //默认查询积分商品
 			List<WsProduct> wsProductList=wsProductService.findList(wsProduct);
 			for (WsProduct prod:wsProductList) {
 				prod.setProdImage(UrlUtils.getNetUrl(prod.getProdImage()));

@@ -39,6 +39,9 @@
 			<if test="parent != null and parent.id != null and parent.id != ''">
 				AND a.parent_id = #{parent.id}
 			</if>
+			<if test="id != null and id != ''">
+				OR a.id = #{id}
+			</if>
 			<if test="parentIds != null and parentIds != ''">
 				AND a.parent_ids LIKE 
 					<if test="dbName == 'oracle'">'%'||#{parentIds}||'%'</if>

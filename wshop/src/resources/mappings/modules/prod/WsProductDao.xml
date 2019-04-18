@@ -72,6 +72,10 @@
 			<if test="prodCategoryId != null and prodCategoryId != ''">
 				AND a.prod_category_id = #{prodCategoryId}
 			</if>
+			<!-- 默认查询积分礼品 -->
+			<if test="isGift != null and isGift != ''">
+				AND  a.is_gift = #{isGift}
+			</if>
 			<if test="title != null and title != ''">
 				AND a.title LIKE 
 					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
