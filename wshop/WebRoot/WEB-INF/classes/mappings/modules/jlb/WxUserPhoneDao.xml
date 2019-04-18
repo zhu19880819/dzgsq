@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.jlb.dao.WxUserPhoneDao">
+    
+	<sql id="wxUserPhoneColumns">
+		a.id 			AS "id",
+		a.open_id 		AS "openId",
+		a.phone 		AS "phone",
+		a.score 		AS "score",
+		a.create_by 	AS "createBy.id",
+		a.create_date 	AS "createDate",
+		a.update_by 	AS "updateBy.id",
+		a.update_date 	AS "updateDate",
+		a.remarks 		AS "remarks",
+		a.del_flag 		AS "delFlag"
+	</sql>
+	
+    
+	<select id="get" resultType="WxUserPhone">
+		SELECT 
+			<include refid="wxUserPhoneColumns"/>
+		FROM wx_user_phone a
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getByOpenId" resultType="WxUserPhone">
+		SELECT 
+			<include refid="wxUserPhoneColumns"/>
+		FROM wx_user_phone a
+		WHERE a.open_id = #{openId} and a.del_flag = '0'
+	</select>
+	
+	<select id="getByMobile" resultType="WxUserPhone">
+		SELECT 
+			<include refid="wxUserPhoneColumns"/>
+		FROM wx_user_phone a
+		WHERE a.phone = #{phone} and a.del_flag = '0'
+	</select>
+	
+	<select id="findList" resultType="WxUserPhone">
+		SELECT 
+			<include refid="wxUserPhoneColumns"/>
+		FROM wx_user_phone a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="phone != null and phone != ''">
+				AND a.phone LIKE 
+					<if test="dbName == 'oracle'">'%'||#{phone}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{phone}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{phone},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="WxUserPhone">
+		SELECT 
+			<include refid="wxUserPhoneColumns"/>
+		FROM wx_user_phone a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findCount" resultType="int">
+		SELECT 
+			count(1)
+		FROM wx_user_phone a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="createDate != null and createDate != ''">
+				AND a.create_date >= #{createDate}
+			</if>
+		</where>		
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO wx_user_phone(
+			id,
+			open_id,
+			phone,
+			score,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{openId},
+			#{phone},
+			#{score},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE wx_user_phone SET 	
+			open_id = #{openId},
+			phone = #{phone},
+			score = #{score},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE wx_user_phone SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="lock">
+		SELECT 1 FROM wx_user_phone WHERE id = #{id} FOR UPDATE
+	</update>
+</mapper>
