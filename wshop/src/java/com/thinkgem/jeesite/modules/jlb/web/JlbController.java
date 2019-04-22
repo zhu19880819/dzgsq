@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.JsonObject;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.modules.cms.utils.WiexinSignUtil;
+import com.thinkgem.jeesite.modules.jlb.service.JlbService;
+import com.thinkgem.jeesite.modules.ws.service.WeiXinService;
 
 
 /**
@@ -24,6 +27,9 @@ import com.thinkgem.jeesite.modules.cms.utils.WiexinSignUtil;
 @Controller
 @RequestMapping(value = "${frontPath}/jlb")
 public class JlbController extends BaseController {
+	
+	@Autowired
+	private JlbService jlbService;
 
 	/**
 	 * 
@@ -58,9 +64,20 @@ public class JlbController extends BaseController {
 	
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	public void post(HttpServletResponse response, HttpServletRequest request) throws IOException {
-//		String respMessage = weiXinService.autoResponse(request);
+		String nonce = request.getParameter("nonce");
+		jlbService.setJblRequest(request);
+		Thread thread = new Thread(jlbService);
+        thread.start();
+        
+        String data = WiexinSignUtil.bytesToHex(nonce.getBytes());
+        
+        JsonObject returnJson = new JsonObject();
+    	returnJson.addProperty("code", 0);
+    	returnJson.addProperty("msg", "SUCC");
+    	returnJson.addProperty("data", data);
+		
 		PrintWriter out = response.getWriter();
-//		out.print(respMessage);
+		out.print(returnJson);
 		out.close();
 	}
 	

@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -43,6 +45,11 @@ public class WxUserPhoneController extends BaseController{
 
 	@Autowired
 	private WxUserPhoneService wxUserPhoneService;
+	
+	/**
+	 * 日志对象
+	 */
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@ModelAttribute
 	public WxUserPhone get(@RequestParam(required=false) String id) {
@@ -99,13 +106,16 @@ public class WxUserPhoneController extends BaseController{
 	@ResponseBody
 	@CrossOrigin
 	public Map getByOpenId(HttpServletRequest request, HttpServletResponse response){
+		logger.info("查询当前微信用户是否绑定");
 		Map data = new HashMap();
 		try{
-			WsMember member=WsUtils.getMember(request, response);
+			WsMember member = WsUtils.getMember(request, response);
 			WxUserPhone wxUserPhone = wxUserPhoneService.getByOpenId(member.getOpenId());
 			if (null != wxUserPhone) {
+				logger.info("已经绑定了");
 				data.put("ret",InterConstant.YES);
 			} else {
+				logger.info("未绑定");
 				data.put("ret",InterConstant.NO);
 			}
 		}catch(WxException e){
@@ -114,7 +124,7 @@ public class WxUserPhoneController extends BaseController{
 		}catch(Exception e){
 			data.put("ret",InterConstant.RET_FAILED);
 			data.put("msg",e.getMessage());
-			logger.error("address/save",e);
+			logger.error("phoneBind/getByOpenId",e);
 		}
 		return data;
 	}
